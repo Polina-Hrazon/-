@@ -353,7 +353,6 @@ namespace Search {
 // БРОНЮВАННЯ КНИГ
 // ВІДПОВІДАЛЬНИЙ: Дудай Владислав
 // ======================================================================
-
 namespace Booking {
 
     const int DAYS = 7;
@@ -616,6 +615,11 @@ namespace Booking {
                 int bookIndex = findBook(bookId);
                 int readerIndex = findReader(readerId);
 
+                // ВИПРАВЛЕННЯ БАГУ №1: зменшуємо кількість вільних примірників у каталозі
+                if (bookIndex >= 0 && books[bookIndex].available > 0) {
+                    books[bookIndex].available--;
+                }
+
                 cout << "Бронювання оформлено: \""
                     << books[bookIndex].title << "\" для "
                     << readers[readerIndex].name
@@ -645,6 +649,9 @@ namespace Booking {
         if (bookIndex >= 0) {
             cout << "Бронювання \"" << books[bookIndex].title
                 << "\" скасовано.\n";
+
+            // ВИПРАВЛЕННЯ БАГУ №2: збільшуємо кількість вільних примірників у каталозі
+            books[bookIndex].available++;
         }
 
         reservations.erase(reservations.begin() + index);
@@ -676,7 +683,6 @@ namespace Booking {
     }
 
 } // namespace Booking
-
 
 // ======================================================================
 // ВИДАЧА ТА ПОВЕРНЕННЯ
