@@ -252,25 +252,37 @@ namespace Search {
         return query;
     }
 
+    string trim(const string & string);
+
     // Повертає індекси книг, що відповідають запиту.
     vector<int> searchBooks(const Query& query) {
         vector<int> found;
+        // ВИПРАВЛЕННЯ ДЕФЕКТУ №1: обрізаємо пробіли на початку та в кінці полів запиту
+        string title = trim(query.title);
+        string author = trim(query.author);
+        string keyword = trim(query.keyword);
 
-        for (int i = 0; i < (int)books.size(); i++) {
-            if (!query.title.empty() &&
-                !contains(books[i].title, query.title))
-                continue;
-
-            if (!query.author.empty() &&
-                !contains(books[i].author, query.author))
-                continue;
-
-            if (!query.keyword.empty() &&
-                !contains(books[i].keywords, query.keyword))
-                continue;
-
-            found.push_back(i);
+        // ВИПРАВЛЕННЯ ДЕФЕКТУ №2: якщо всі поля порожні — повертаємо порожній вектор результатів
+        if (title.empty() && author.empty() && keyword.empty()) {
+            cout << "Введіть хоча б один параметр пошуку." << endl;
+            return found;
         }
+            for (int i = 0; i < (int)books.size(); i++)
+            {
+                if (!title.empty() &&
+                    !contains(books[i].title, title))
+                    continue;
+
+                if (!author.empty() &&
+                    !contains(books[i].author, author))
+                    continue;
+
+                if (!keyword.empty() &&
+                    !contains(books[i].keywords, keyword))
+                    continue;
+
+                found.push_back(i);
+            }
 
         return found;
     }
