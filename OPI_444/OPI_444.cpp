@@ -773,9 +773,31 @@ namespace IssueReturn {
         if (books[bookIndex].available <= 0)
             return "Відмова: вільних примірників немає.";
 
+        // ВИПРАВЛЕННЯ БАГУ №2 (початок): враховуємо бронювання інших читачів 
+        int reservedByOthers = 0;
+
+        for (const Booking::Reservation& res : Booking::reservations) {
+            if (res.bookId == bookId && res.readerId != readerId)
+                reservedByOthers++;
+        }
+
+        if (books[bookIndex].available - reservedByOthers <= 0)
+            return "Відмова: книгу заброньовано іншим читачем.";
+        // ВИПРАВЛЕННЯ БАГУ №2 (кінець)
+
         books[bookIndex].available--;
 
         loans.push_back({ readerId, bookId });
+
+        // ВИПРАВЛЕННЯ БАГУ №1 (початок): бронювання виконано, знімаємо його
+        int resIndex = Booking::findReservation(readerId, bookId);
+
+        if (resIndex >= 0) {
+            Booking::reservations.erase(
+                Booking::reservations.begin() + resIndex
+            );
+        }
+        // ВИПРАВЛЕННЯ БАГУ №1 (кінець) 
 
         // Журнал містить ID, а не копії назв книг і читачів.
         LibraryData::operations.push_back({
