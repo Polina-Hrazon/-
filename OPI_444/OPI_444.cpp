@@ -1256,6 +1256,13 @@ namespace Statistics {
 
         result.periodDays = end - start + 1;
 
+        // ВИПРАВЛЕННЯ БАГУ №1: заздалегідь додаємо всі тижні періоду
+        // з нульовим обігом, щоб у звіт потрапляли й тижні без видач.
+        int weeksCount = (result.periodDays + 6) / 7;
+
+        for (int week = 1; week <= weeksCount; week++)
+            result.weeklyTurnover[week] = 0;
+
         for (const Operation& operation : operations) {
             if (!isValidDate(operation.date))
                 continue;
@@ -1308,12 +1315,25 @@ namespace Statistics {
         }
 
         // Найпопулярніша книга.
+        // ВИПРАВЛЕННЯ БАГУ №2: спочатку визначаємо максимальну кількість
+        // видач, а потім виводимо всі книги з таким самим показником.
         int best = 0;
 
         for (const auto& item : result.bookCounts) {
-            if (item.second > best) {
+            if (item.second > best)
                 best = item.second;
-                result.mostPopularBook = item.first;
+        }
+
+        if (best > 0) {
+            result.mostPopularBook = "";
+
+            for (const auto& item : result.bookCounts) {
+                if (item.second == best) {
+                    if (!result.mostPopularBook.empty())
+                        result.mostPopularBook += ", ";
+
+                    result.mostPopularBook += item.first;
+                }
             }
         }
 
