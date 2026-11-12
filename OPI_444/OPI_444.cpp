@@ -252,7 +252,14 @@ namespace Search {
         return query;
     }
 
-    string trim(const string & string);
+    string trim(const string& str) {
+        size_t first = str.find_first_not_of(" \t\r\n");
+        if (first == string::npos)
+            return "";
+        size_t last = str.find_last_not_of(" \t\r\n");
+        return str.substr(first, (last - first + 1));
+    }
+
 
     // Повертає індекси книг, що відповідають запиту.
     vector<int> searchBooks(const Query& query) {
