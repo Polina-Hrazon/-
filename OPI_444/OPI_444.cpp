@@ -1457,3 +1457,4 @@ int main() {
 
     return 0;
 }
+// Version 2: branch conflict-2 change
